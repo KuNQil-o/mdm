@@ -1,0 +1,1 @@
+{"name":"mdm-ui","private":true,"version":"0.1.0","type":"module","scripts":{"dev":"vite --host 0.0.0.0","build":"vue-tsc --noEmit && vite build","typecheck":"vue-tsc --noEmit","test:e2e":"playwright test"},"dependencies":{"vue":"3.5.13"},"devDependencies":{"vite":"6.2.2","@vitejs/plugin-vue":"5.2.3","typescript":"5.7.3","vue-tsc":"2.2.8","@playwright/test":"1.51.1"}}

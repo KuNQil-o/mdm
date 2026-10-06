@@ -1,0 +1,13 @@
+{
+ "attributes":[
+  {"code":"innerDiameter","label":"内径","type":"DECIMAL","unit":"mm","required":true,"min":0.001,"searchable":true,"sortable":true,"group":"尺寸"},
+  {"code":"outerDiameter","label":"外径","type":"DECIMAL","unit":"mm","required":true,"min":0.001,"searchable":true,"sortable":true,"group":"尺寸"},
+  {"code":"bearingWidth","label":"宽度","type":"DECIMAL","unit":"mm","required":true,"min":0.001,"searchable":true,"group":"尺寸"},
+  {"code":"precision","label":"精度","type":"ENUM","dictionaryCode":"PRECISION","required":true,"searchable":true,"group":"技术参数"},
+  {"code":"seal","label":"密封形式","type":"ENUM","dictionaryCode":"SEAL","required":true,"searchable":true,"group":"技术参数"},
+  {"code":"description","label":"说明","type":"STRING","group":"补充信息"}
+ ],
+ "validations":[{"field":"outerDiameter","assert":{"op":"gt","args":[{"field":"outerDiameter"},{"field":"innerDiameter"}]},"message":"外径必须大于内径"}],
+ "codeRule":{"separator":"-","segments":[{"type":"CONST","value":"BR"},{"type":"ATTR","field":"innerDiameter"},{"type":"ATTR","field":"outerDiameter"},{"type":"ATTR","field":"bearingWidth"},{"type":"ATTR","field":"precision"},{"type":"ATTR","field":"seal"}]},
+ "samples":[{"name":"轴承正常样本","attributes":{"innerDiameter":{"value":20,"unit":"mm"},"outerDiameter":{"value":47,"unit":"mm"},"bearingWidth":{"value":14,"unit":"mm"},"precision":"P0","seal":"2RS"}}]
+}

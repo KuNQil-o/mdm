@@ -1,0 +1,11 @@
+ALTER TABLE schema_version ADD COLUMN ever_published boolean NOT NULL DEFAULT false;
+UPDATE schema_version SET ever_published=true WHERE status IN ('PUBLISHED','RETIRED');
+CREATE OR REPLACE FUNCTION guard_published() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+ IF TG_TABLE_NAME='schema_version' THEN
+  IF OLD.ever_published AND NEW.bundle IS DISTINCT FROM OLD.bundle THEN RAISE EXCEPTION 'IMMUTABLE_PUBLISHED_SCHEMA'; END IF;
+  IF NEW.status='PUBLISHED' THEN NEW.ever_published=true; END IF;
+ END IF;
+ IF TG_TABLE_NAME='mapping_version' THEN
+  IF OLD.state='PUBLISHED' AND (NEW.config IS DISTINCT FROM OLD.config OR NEW.state IS DISTINCT FROM OLD.state) THEN RAISE EXCEPTION 'IMMUTABLE_PUBLISHED_MAPPING'; END IF;
+ END IF;
+ RETURN NEW; END; $$;

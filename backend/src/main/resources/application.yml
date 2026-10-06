@@ -1,0 +1,28 @@
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+spring:
+  profiles:
+    default: dev
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mdm}
+    username: ${DATABASE_USER:mdm}
+    password: ${DATABASE_PASSWORD:mdm_dev_only}
+    hikari:
+      maximum-pool-size: 16
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 21MB
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+mdm:
+  retry-delays: ${RETRY_DELAYS:60,300,1800,7200}
+  worker-delay: ${WORKER_DELAY:1000}
