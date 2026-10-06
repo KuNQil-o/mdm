@@ -6,3 +6,5 @@ export MAVEN_OPTS="${MAVEN_OPTS:-} -Dmaven.repo.local=/workspace/.tools/m2"
 # Explicit local demo source credentials; production source profiles use their own environment refs.
 export ERP_READ_USER="${ERP_READ_USER:-mdm_erp_reader}"
 export ERP_READ_PASSWORD="${ERP_READ_PASSWORD:-erp_read_dev_only}"
+# Local simulator source-client credential; never sent to the browser.
+export ERP_DEMO_SOURCE_KEY="${ERP_DEMO_SOURCE_KEY:-erp-glass-demo-dev-only}"

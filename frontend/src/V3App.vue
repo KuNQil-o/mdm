@@ -390,6 +390,7 @@ onMounted(() =>
       <div class="v3-brand">MDM <span>V3.0</span></div>
       <p class="v3-subtitle">物料标准化与料号平台</p>
       <div class="v3-source-label">事实源 · ERP</div>
+      <a href="/erp/" style="display: block; margin: 16px; color: inherit">打开 ERP 测试页面 ↗</a>
       <nav>
         <button
           v-for="[id, label] in tabs"

@@ -3,7 +3,7 @@ set -euo pipefail
 mdm_root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$mdm_root"
 mdm_suite=${1:-all}
-case "$mdm_suite" in all|backend|http|browser|operations) ;; *) echo 'Usage: scripts/test.sh [all|backend|http|browser|operations]' >&2;exit 2;; esac
+case "$mdm_suite" in all|backend|http|browser|operations|erp) ;; *) echo 'Usage: scripts/test.sh [all|backend|http|browser|operations|erp]' >&2;exit 2;; esac
 mkdir -p .runtime
 scripts/start.sh
 scripts/seed.sh > .runtime/v3-seed.log 2>&1
@@ -17,6 +17,10 @@ fi
 if [ "$mdm_suite" = all ] || [ "$mdm_suite" = http ]; then
  python3 tests/v3_acceptance.py > .runtime/v3-acceptance.log 2>&1
  tail -5 .runtime/v3-acceptance.log
+fi
+if [ "$mdm_suite" = all ] || [ "$mdm_suite" = erp ]; then
+ python3 tests/erp_workflow.py > .runtime/erp-workflow.log 2>&1
+ tail -1 .runtime/erp-workflow.log
 fi
 if [ "$mdm_suite" = all ] || [ "$mdm_suite" = browser ]; then
  if [ ! -f .runtime/v3-acceptance-fixtures.json ]; then python3 tests/v3_acceptance.py > .runtime/v3-acceptance.log 2>&1;fi

@@ -31,11 +31,14 @@ bash scripts/test.sh http
 
 页面支持来源登记、DDL/JDBC/API Object、Dataset Root/Join/Grain、真实数据预览、Schema/Mapping/Identity/Rule 草稿、组合发布、扫描、台账类型化搜索、解释链、回写/异常和对账。复杂元数据通过 JSON 编辑器配置。ERP 属性由 ERP 修改，页面发号操作读取登记来源记录。
 
+**ERP 业务流程测试：** `seed.sh` 同时初始化玻璃布多表演示配置并完成双人发布。打开前端入口的 `/erp/`，或点击 MDM 左侧“打开 ERP 测试页面”，选择厂商、布种/基重、表面处理、幅宽等，点击“保存并申请料号”。ERP 保存后自动调用 MDM，按发布规则生成 `GC` + 六位流水并回填“玻璃布料号”；无需登录 MDM。操作及故障恢复见 [ERP 模拟器测试说明](docs/ERP模拟器测试说明.md)。
+
 ```bash
-bash scripts/test.sh all          # 后端 → HTTP → 浏览器 → 重启/备份恢复，串行
+bash scripts/test.sh all          # 后端 → HTTP → ERP 主动申请 → 浏览器 → 重启/备份恢复，串行
 bash scripts/test.sh backend      # 真实 PostgreSQL，独立 mdm_test
 bash scripts/test.sh http         # V3 API 验收，开发 ERP
-bash scripts/test.sh browser      # 4 个 Chromium 端到端流程
+bash scripts/test.sh erp          # ERP 保存/主动申请/回填/幂等与异常恢复
+bash scripts/test.sh browser      # 4 个 MDM + 3 个 ERP Chromium 端到端流程
 bash scripts/test.sh operations   # 重启及两库独立恢复验证
 ```
 

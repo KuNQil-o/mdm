@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ERP · 玻璃布测试</title><link rel="stylesheet" href="/erp/style.css"><script src="/erp/app.js" defer></script></head>
+<body><header><div><span class="eyebrow">开发 ERP · 物料事实源</span><h1>玻璃布管理</h1><p>在 ERP 新建并保存物料，自动向 MDM 申请料号，再继续原有业务流程。</p></div><a href="/">返回 MDM 控制台</a></header>
+<main><section class="flow"><span>ERP 保存</span><b>→</b><span>MDM 校验与发号</span><b>→</b><span>ERP 自动回填</span><b>→</b><span>业务继续</span></section>
+<div id="message" role="status" hidden></div>
+<section class="panel"><div class="heading"><h2 id="form-title">新建玻璃布</h2><button id="new" type="button" class="secondary">新建另一条</button></div>
+<form id="form"><div class="grid"><label>发号配置<select id="integration" aria-label="发号配置" required></select></label><label>ERP 来源键<input id="record-key" aria-label="ERP 来源键" readonly></label>
+<label>厂商<select id="manufacturer_id" aria-label="厂商" required></select></label><label>布种<select id="cloth-type" aria-label="布种" required></select></label><label>布种 / 基重<select id="weight_id" aria-label="布种 / 基重" required></select></label><label>表面处理<select id="treatment_id" aria-label="表面处理" required></select></label><label>幅宽<select id="width_id" aria-label="幅宽" required></select></label><label>形态<select id="form_id" aria-label="形态" required></select></label><label>等级<select id="grade_id" aria-label="等级" required></select></label><label>玻璃布料号<input id="material-no" aria-label="玻璃布料号" readonly placeholder="保存并申请后自动写入"></label></div>
+<label class="remarks">备注<textarea id="remarks" aria-label="备注" rows="2" placeholder="非身份属性，可在发号后修改"></textarea></label>
+<div class="actions"><button type="submit" id="save-assign">保存并申请料号</button><button type="button" id="save" class="secondary">仅保存</button><button type="button" id="retry" class="secondary" disabled>申请 / 重试料号</button><span id="business-state">待保存</span></div></form>
+<p class="note">相同规格组合会触发身份冲突。再次测试新物料时，请改变厂商、处理、幅宽等身份属性。示例料号为 GC + 六位流水，由 MDM 发布规则决定。</p></section>
+<section class="panel"><div class="heading"><h2>ERP 记录与发号结果</h2><button id="refresh" class="secondary">刷新列表</button></div><div class="table-wrap"><table><thead><tr><th>来源键</th><th>厂商</th><th>布种 / 基重</th><th>幅宽</th><th>玻璃布料号</th><th>处理状态</th><th>操作</th></tr></thead><tbody id="records"></tbody></table></div><p id="empty" class="note" hidden>暂无记录，先新建一条玻璃布。</p></section>
+<section class="panel" id="details-panel" hidden><h2>处理详情</h2><pre id="details"></pre></section></main></body></html>

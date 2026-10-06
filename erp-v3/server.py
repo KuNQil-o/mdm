@@ -1,9 +1,11 @@
 """Independent development ERP SoR. PostgreSQL persists source data, writeback receipts and downstream data."""
 import argparse,decimal,json,os,re,sys,time,uuid
+from pathlib import Path
 from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
 from urllib.parse import urlparse,unquote,parse_qs
 sys.path.insert(0,'/workspace/.tools/python')
 import psycopg
+import workflow
 from psycopg import sql
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb,set_json_loads
@@ -20,6 +22,8 @@ with connection() as c:
  c.execute("CREATE TABLE IF NOT EXISTS erp_writeback_receipt(key text PRIMARY KEY,body_hash text NOT NULL,record_table text,record_key text,material_no text,state text,response jsonb,created_at timestamptz DEFAULT now())")
  c.execute("CREATE TABLE IF NOT EXISTS erp_scenario(target text PRIMARY KEY,mode text NOT NULL,remaining integer NOT NULL)")
 allowed={'cloth','manufacturer','treatment','cloth_type','cloth_weight','width_ref','form_ref','grade_ref','duplicate_ref','flat_material'}
+workflow.initialize(connection)
+static=Path(__file__).parent/'static'
 class Handler(BaseHTTPRequestHandler):
  def log_message(self,fmt,*args):print(fmt%args,flush=True)
  def respond(self,status,obj,headers=None):
@@ -38,6 +42,25 @@ class Handler(BaseHTTPRequestHandler):
   return row
  def do_GET(self):
   parts=self.route()
+  if parts in (['erp'],['erp','app.js'],['erp','style.css']):
+   file=static/('index.html' if parts==['erp'] else parts[1]);raw=file.read_bytes()
+   self.send_response(200);self.send_header('Content-Type',{'html':'text/html; charset=utf-8','js':'text/javascript; charset=utf-8','css':'text/css; charset=utf-8'}[file.suffix[1:]]);self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw);return
+  if parts[:2]==['erp','api']:
+   try:
+    with connection() as c:
+     if parts==['erp','api','config']:
+      configs=c.execute('select code,tenant_code,dataset_code,record_table from erp_mdm_integration where enabled order by code').fetchall()
+      refs={name:c.execute(sql.SQL('select * from {} where active order by id').format(self.table(name))).fetchall() for name in ['manufacturer','cloth_type','cloth_weight','treatment','width_ref','form_ref','grade_ref']}
+      return self.respond(200,{'integrations':configs,'references':refs})
+     query=parse_qs(urlparse(self.path).query);cfg=workflow.integration(c,query.get('integration',['ERP_GLASS_DEMO'])[0])
+     if parts==['erp','api','cloth']:
+      rows=c.execute('''select c.*,r.state as request_state,r.error as request_error,r.result as assignment
+          from cloth c left join erp_number_request r on r.source_record_key=c.id and r.integration_code=%s
+          where c.status=%s order by c.updated_at desc limit 100''',(cfg['code'],cfg['candidate_status'])).fetchall()
+      return self.respond(200,rows)
+     if len(parts)==4 and parts[2]=='cloth':return self.respond(200,workflow.record(c,cfg,parts[3]))
+    return self.respond(404,{'success':False,'code':'NOT_FOUND'})
+   except workflow.WorkflowError as e:return self.respond(e.status,e.body)
   with connection() as c:
    if parts==['health']:return self.respond(200,{'status':'UP','kind':'ERP_V3_SOURCE_OF_RECORD'})
    if parts==['contract']:return self.respond(200,{'materialNoField':'materialNo','idempotency':True,'conditionalEmptyWrite':True,'queryCurrentValue':True})
@@ -61,6 +84,18 @@ class Handler(BaseHTTPRequestHandler):
  def do_POST(self):
   try:
    parts=self.route();body=self.body()
+   if parts[:2]==['erp','api']:
+    code=body.get('integration','ERP_GLASS_DEMO')
+    if parts==['erp','api','cloth']:
+     key=body.get('id') or str(uuid.uuid4())
+     if not isinstance(key,str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,80}',key):raise workflow.WorkflowError(422,'SOURCE_KEY_INVALID','来源键须为 1–80 位字母、数字、下划线、点或连字符')
+     values=body.get('fields',{})
+     if not isinstance(values,dict):raise workflow.WorkflowError(422,'INVALID_SOURCE_FIELD','fields 必须为对象')
+     result=workflow.perform(connection,dumps,code,key,values,body.get('assign',True))
+     return self.respond(200,result)
+    if len(parts)==5 and parts[2]=='cloth' and parts[4]=='request-number':
+     return self.respond(200,workflow.perform(connection,dumps,code,parts[3]))
+    return self.respond(404,{'success':False,'code':'NOT_FOUND'})
    with connection() as c:
     if len(parts)==2 and parts[0]=='scenarios':
      mode=body.get('mode','SUCCESS');assert mode in ['SUCCESS','BUSINESS_FAIL','SERVER_ERROR','RATE_LIMIT','LOST_RESPONSE','ACCEPTED','UNKNOWN','DELAY_QUERY']
@@ -78,7 +113,8 @@ class Handler(BaseHTTPRequestHandler):
      else:return self.respond(404,{'success':False})
      return self.respond(200,{'success':True})
    return self.respond(404,{'success':False,'code':'NOT_FOUND'})
-  except Exception:return self.respond(422,{'success':False,'code':'INVALID_SOURCE_RECORD'})
+  except workflow.WorkflowError as e:return self.respond(e.status,e.body)
+  except Exception:return self.respond(422,{'success':False,'code':'INVALID_SOURCE_RECORD','message':'ERP 记录无效，请检查输入；已保存记录可刷新列表查看'})
  def do_PATCH(self):
   parts=self.route();body=self.body()
   try:
