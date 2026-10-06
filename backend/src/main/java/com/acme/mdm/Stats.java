@@ -14,7 +14,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class Stats extends OncePerRequestFilter {
   static class Samples {
     final LongAdder total = new LongAdder(), errors = new LongAdder();
-    final ArrayDeque<Double> latency = new ArrayDeque<>(), rules = new ArrayDeque<>();
+    final ArrayDeque<Double> latency = new ArrayDeque<>(),
+        rules = new ArrayDeque<>(),
+        issues = new ArrayDeque<>(),
+        writes = new ArrayDeque<>();
+    final LongAdder issueTotal = new LongAdder(),
+        issueFailures = new LongAdder(),
+        writeTotal = new LongAdder(),
+        writeFailures = new LongAdder();
   }
 
   final ConcurrentHashMap<String, Samples> byTenant = new ConcurrentHashMap<>();
@@ -38,6 +45,37 @@ public class Stats extends OncePerRequestFilter {
 
   public void rule(String tenant, long ns) {
     add(byTenant.computeIfAbsent(tenant, x -> new Samples()).rules, ns / 1_000_000.0);
+  }
+
+  public void issue(String tenant, long ns, boolean success) {
+    var s = byTenant.computeIfAbsent(tenant, k -> new Samples());
+    s.issueTotal.increment();
+    if (!success) s.issueFailures.increment();
+    add(s.issues, ns / 1_000_000.0);
+  }
+
+  public void write(String tenant, long ns, boolean failed) {
+    var s = byTenant.computeIfAbsent(tenant, k -> new Samples());
+    s.writeTotal.increment();
+    if (failed) s.writeFailures.increment();
+    add(s.writes, ns / 1_000_000.0);
+  }
+
+  public ObjectNode numberingMetrics(String tenant) {
+    var s = byTenant.computeIfAbsent(tenant, k -> new Samples());
+    return Json.object(
+        "issueP95Ms",
+        p95(s.issues),
+        "issueSuccessPercent",
+        s.issueTotal.sum() == 0
+            ? "未采集"
+            : 100.0 * (s.issueTotal.sum() - s.issueFailures.sum()) / s.issueTotal.sum(),
+        "writebackP95Ms",
+        p95(s.writes),
+        "writebackFailurePercent",
+        s.writeTotal.sum() == 0 ? "未采集" : 100.0 * s.writeFailures.sum() / s.writeTotal.sum(),
+        "scope",
+        "当前进程最近2000次发号调用/实际领取回写；含幂等请求，业务最终失败单独统计");
   }
 
   public ObjectNode metrics(String tenant) {

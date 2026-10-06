@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Deliveries {
+  @org.springframework.beans.factory.annotation.Value("${mdm.legacy-v2:false}")
+  boolean legacyV2;
+
   final Db db;
   final Models models;
   final Integrations integrations;
@@ -142,6 +145,7 @@ public class Deliveries {
 
   @Scheduled(fixedDelayString = "${mdm.worker-delay:1000}")
   public void work() {
+    if (!legacyV2) return;
     for (int n = 0; n < 10; n++) {
       ObjectNode d = claim();
       if (d == null) break;
@@ -508,6 +512,7 @@ order by d.created_at for update of d,s skip locked limit 1
 
   @Scheduled(cron = "0 0 2 * * *", zone = "UTC")
   public void dailyReconcile() {
+    if (!legacyV2) return;
     for (var s :
         db.list(
             "select s.* from integration_system s join tenant t on t.id=s.tenant_id where s.active"

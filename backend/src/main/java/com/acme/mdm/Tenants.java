@@ -92,12 +92,37 @@ public class Tenants {
 
   public void defaults(UUID id) {
     Map<String, List<String>> rs = new LinkedHashMap<>();
-    rs.put("ADMIN", List.of("READ", "ADMIN", "EXPORT", "INTEGRATE"));
-    rs.put("DESIGNER", List.of("READ", "DESIGN", "EXPORT"));
+    rs.put(
+        "ADMIN",
+        List.of(
+            "READ",
+            "ADMIN",
+            "EXPORT",
+            "INTEGRATE",
+            "SOURCE_EDIT",
+            "SOURCE_IMPORT",
+            "DATASET_DESIGN",
+            "MAPPING_DESIGN",
+            "IDENTITY_DESIGN",
+            "RULE_DESIGN"));
+    rs.put(
+        "DESIGNER",
+        List.of(
+            "READ",
+            "DESIGN",
+            "EXPORT",
+            "SOURCE_EDIT",
+            "SOURCE_IMPORT",
+            "DATASET_DESIGN",
+            "MAPPING_DESIGN",
+            "IDENTITY_DESIGN",
+            "RULE_DESIGN"));
     rs.put("PUBLISHER", List.of("READ", "PUBLISH", "EXPORT"));
     rs.put("EDITOR", List.of("READ", "CREATE", "EDIT", "SUBMIT", "IMPORT", "EXPORT", "LEGACY"));
     rs.put("APPROVER", List.of("READ", "APPROVE", "EXPORT"));
-    rs.put("INTEGRATOR", List.of("READ", "INTEGRATE", "EXPORT"));
+    rs.put(
+        "INTEGRATOR",
+        List.of("READ", "INTEGRATE", "EXPORT", "SCAN", "ASSIGN", "WRITEBACK", "RECONCILE"));
     rs.put("READER", List.of("READ"));
     rs.forEach(
         (k, v) ->
@@ -107,7 +132,10 @@ public class Tenants {
                 id,
                 k,
                 k,
-                Json.str(v)));
+                Json.str(
+                    java.util.stream.Stream.concat(
+                            v.stream(), java.util.stream.Stream.of("SOURCE_READ"))
+                        .toList())));
   }
 
   public JsonNode patch(String actor, String id, JsonNode b, String v) {
@@ -171,6 +199,25 @@ public class Tenants {
             yield "ACTIVE";
           }
           case "archive" -> {
+            Problem.require(
+                db.count(
+                            "select count(*) from writeback_task where tenant_id=? and state not in"
+                                + " ('SUCCEEDED','FAILED')",
+                            UUID.fromString(id))
+                        == 0
+                    && db.count(
+                            "select count(*) from processing_task where tenant_id=? and status in"
+                                + " ('DISCOVERED','PROCESSING','RETRY_WAIT')",
+                            UUID.fromString(id))
+                        == 0
+                    && db.count(
+                            "select count(*) from scan_job where tenant_id=? and status in"
+                                + " ('PENDING','SCANNING','PROCESSING')",
+                            UUID.fromString(id))
+                        == 0,
+                409,
+                "UNFINISHED_TASKS",
+                "归档前必须处理V3扫描、发号与未确认回写任务");
             Problem.require(
                 state.equals("ACTIVE") || state.equals("SUSPENDED"),
                 409,
@@ -283,7 +330,9 @@ public class Tenants {
 
   public JsonNode member(Ctx c, JsonNode b, String id, String v) {
     c.check("ADMIN", null);
-    JsonNode roles = b.path("roles"), scope = b.path("categoryScope");
+    JsonNode roles = b.path("roles"),
+        scope = b.path("categoryScope"),
+        sourceScope = b.has("sourceScope") ? b.path("sourceScope") : Json.arr().add("*");
     if (id != null) {
       var old =
           db.one(
@@ -293,6 +342,7 @@ public class Tenants {
       Db.version(old, v);
       if (!b.has("roles")) roles = old.path("roles");
       if (!b.has("categoryScope")) scope = old.path("categoryScope");
+      if (!b.has("sourceScope")) sourceScope = old.path("sourceScope");
       Problem.require(
           !b.has("userId") || b.path("userId").equals(old.path("userId")),
           422,
@@ -305,6 +355,20 @@ public class Tenants {
     for (var code : scope)
       if (!code.asText().equals("*"))
         db.one("select code from category where tenant_id=? and code=?", c.tid(), code.asText());
+    Problem.require(sourceScope.isArray(), 422, "SOURCE_SCOPE", "来源范围须为数组");
+    for (var source : sourceScope)
+      if (!source.asText().equals("*"))
+        Problem.require(
+            db.count(
+                    "select count(*) from source_system where tenant_id=? and (id::text=? or"
+                        + " code=?)",
+                    c.tid(),
+                    source.asText(),
+                    source.asText())
+                > 0,
+            422,
+            "SOURCE_SCOPE",
+            "来源不属于当前租户");
     boolean active = b.path("active").asBoolean(true);
     if (id == null) {
       UUID uid = UUID.fromString(Json.text(b, "userId"));
@@ -329,6 +393,11 @@ public class Tenants {
           Json.str(scope),
           c.tid(),
           UUID.fromString(id));
+    db.run(
+        "update tenant_member set source_scope=?::jsonb where tenant_id=? and id=?",
+        Json.str(sourceScope),
+        c.tid(),
+        UUID.fromString(id));
     var res =
         db.one(
             "select * from tenant_member where tenant_id=? and id=?", c.tid(), UUID.fromString(id));
@@ -362,7 +431,18 @@ public class Tenants {
             "IMPORT",
             "EXPORT",
             "INTEGRATE",
-            "LEGACY");
+            "LEGACY",
+            "SOURCE_READ",
+            "SOURCE_EDIT",
+            "SOURCE_IMPORT",
+            "DATASET_DESIGN",
+            "MAPPING_DESIGN",
+            "IDENTITY_DESIGN",
+            "RULE_DESIGN",
+            "SCAN",
+            "ASSIGN",
+            "WRITEBACK",
+            "RECONCILE");
     b.path("actions")
         .forEach(
             x -> Problem.require(allowed.contains(x.asText()), 422, "ROLE_ACTION", "未支持的角色动作"));

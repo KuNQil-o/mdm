@@ -183,6 +183,11 @@ public class Models {
   }
 
   public ObjectNode enrich(Ctx c, JsonNode src, int version) {
+    Problem.require(
+        !src.has("_syntaxOnly") && !src.has("_resolvedReferences") && !src.has("_observeExisting"),
+        422,
+        "CONFIG_RESERVED_FIELD",
+        "内部执行标记不可由配置写入");
     ObjectNode b = (ObjectNode) src.deepCopy();
     b.put("version", version);
     ObjectNode units = Json.obj();
@@ -334,6 +339,16 @@ public class Models {
   }
 
   public JsonNode patchSchema(Ctx c, String id, JsonNode body, String v) {
+    Problem.require(
+        db.count(
+                "select count(*) from release_package where tenant_id=? and schema_id=? and"
+                    + " status='REVIEW'",
+                c.tid(),
+                uuid(id))
+            == 0,
+        409,
+        "CONFIGURATION_IN_REVIEW",
+        "Schema在待审发布包中，须先撤回再编辑");
     var x = schema(c, id, false);
     var cat = categoryById(c, Json.text(x, "categoryId"));
     c.check("DESIGN", Json.text(cat, "code"));

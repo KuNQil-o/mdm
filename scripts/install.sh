@@ -21,3 +21,5 @@ npm --prefix "$mdm_root/frontend" ci --cache "$mdm_tools/npm-cache" --no-audit -
 npm --prefix "$mdm_root/frontend" run build --cache "$mdm_tools/npm-cache"
 # Installation builds the application; business tests require a separately prepared PostgreSQL database.
 "$mdm_root/scripts/mvn.sh" -q -DskipTests package
+
+python3 -m pip install --target "$mdm_tools/python" -r "$mdm_root/erp-v3/requirements.txt"

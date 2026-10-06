@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Imports {
+  @org.springframework.beans.factory.annotation.Value("${mdm.legacy-v2:false}")
+  boolean legacyV2;
+
   final Db db;
   final Models models;
   final Materials materials;
@@ -450,6 +453,7 @@ public class Imports {
 
   @Scheduled(fixedDelayString = "${mdm.worker-delay:1000}")
   public void work() {
+    if (!legacyV2) return;
     for (var j :
         db.list(
             "select j.* from import_job j join tenant t on t.id=j.tenant_id where t.status='ACTIVE'"

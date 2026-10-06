@@ -101,7 +101,14 @@ public class Rules {
           && !p.path("visibleWhen").asBoolean())
         throw new Problem(422, "CONDITION_CONFLICT", "条件必填与隐藏冲突");
     }
+    if (b.path("codeRule").has("allowedPattern"))
+      safePattern(b.path("codeRule").path("allowedPattern").asText());
     order(b);
+    for (var validation : b.path("validations")) {
+      Problem.require(
+          nodes(validation.path("assert")) <= 200, 422, "RULE_BUDGET", "业务校验AST超过200节点");
+      checkAst(validation.path("assert"), f);
+    }
     for (var s : b.path("codeRule").path("segments")) {
       String type = s.path("type").asText();
       Problem.require(
@@ -140,8 +147,24 @@ public class Rules {
       if (n.has("op"))
         Problem.require(
             Set.of(
-                    "eq", "ne", "gt", "gte", "lt", "lte", "in", "and", "or", "not", "exists", "add",
-                    "sub", "mul", "div")
+                    "eq",
+                    "ne",
+                    "gt",
+                    "gte",
+                    "lt",
+                    "lte",
+                    "in",
+                    "and",
+                    "or",
+                    "not",
+                    "exists",
+                    "add",
+                    "sub",
+                    "mul",
+                    "div",
+                    "concat",
+                    "coalesce",
+                    "if")
                 .contains(n.path("op").asText()),
             422,
             "UNKNOWN_OPERATOR",
@@ -177,12 +200,30 @@ public class Rules {
     if (n.has("field")) return scalar(Json.path(a, n.path("field").asText()));
     if (n.has("literal")) return n.get("literal");
     String op = n.path("op").asText();
+    if (op.equals("if")) {
+      Problem.require(n.path("args").size() == 3, 422, "RULE_ARITY", "if须有条件和两个分支");
+      return eval(n.path("args").get(Json.truth(eval(n.path("args").get(0), a)) ? 1 : 2), a);
+    }
+    if (op.equals("coalesce")) {
+      for (var arg : n.path("args")) {
+        var value = eval(arg, a);
+        if (!value.isNull() && !value.isMissingNode()) return value;
+      }
+      return NullNode.instance;
+    }
     List<JsonNode> args = new ArrayList<>();
     n.path("args").forEach(x -> args.add(eval(x, a)));
     JsonNode x = args.isEmpty() ? NullNode.instance : args.getFirst(),
         y = args.size() > 1 ? args.get(1) : NullNode.instance;
     boolean result;
     switch (op) {
+      case "concat":
+        StringBuilder joined = new StringBuilder();
+        for (var value : args) {
+          Problem.require(!value.isNull(), 422, "DEPENDENCY_MISSING", "拼接属性为空");
+          joined.append(value.asText());
+        }
+        return TextNode.valueOf(joined.toString());
       case "and":
         return BooleanNode.valueOf(args.stream().allMatch(Json::truth));
       case "or":
@@ -355,7 +396,7 @@ public class Rules {
                   "RULE_FAILED",
                   rule.path("message").asText("业务规则未通过"),
                   b);
-          if (!rule.path("severity").asText().equals("warning")) errors.add(er);
+          if (!rule.path("severity").asText().equalsIgnoreCase("warning")) errors.add(er);
         }
       } catch (Problem p) {
         if (full) errors.add(error("", p.code, p.getMessage(), b));
@@ -490,14 +531,21 @@ public class Rules {
             422,
             "TYPE_REFERENCE",
             "引用应为{type,id}且类型一致");
+        if (b.path("_syntaxOnly").asBoolean())
+          return Json.object("type", v.path("type"), "id", v.path("id").asText());
         var r =
-            db.maybe(
-                "select * from reference_entity where tenant_id=? and type=? and id=?",
-                c.tid(),
-                v.path("type").asText(),
-                v.path("id").asText());
+            b.path("_resolvedReferences").has(v.path("type").asText() + ":" + v.path("id").asText())
+                ? (ObjectNode)
+                    b.path("_resolvedReferences")
+                        .path(v.path("type").asText() + ":" + v.path("id").asText())
+                : db.maybe(
+                    "select * from reference_entity where tenant_id=? and type=? and id=?",
+                    c.tid(),
+                    v.path("type").asText(),
+                    v.path("id").asText());
         Problem.require(r != null, 422, "REFERENCE_OWNERSHIP", "引用不属于当前租户或不存在");
-        if (full) Problem.require(r.path("active").asBoolean(), 422, "REFERENCE_INACTIVE", "引用已停用");
+        if (full && !b.path("_observeExisting").asBoolean())
+          Problem.require(r.path("active").asBoolean(), 422, "REFERENCE_INACTIVE", "引用已停用");
         return Json.object("type", v.path("type").asText(), "id", v.path("id").asText());
       default:
         throw new Problem(422, "ATTRIBUTE_TYPE", "未知类型");
@@ -599,7 +647,9 @@ public class Rules {
 
   public ObjectNode parse(Ctx c, JsonNode schema, String no) {
     Problem.require(no.length() <= 128, 422, "CODE_LENGTH", "料号超过128字符");
-    JsonNode b = schema.path("bundle"), p = b.path("parseRule");
+    ObjectNode b = (ObjectNode) schema.path("bundle").deepCopy();
+    b.put("_syntaxOnly", true);
+    JsonNode p = b.path("parseRule");
     Problem.require(!p.isMissingNode(), 422, "PARSE_RULE_MISSING", "此版本无解析规则");
     ObjectNode attrs = Json.obj();
     ArrayNode errors = Json.arr(), unparsed = Json.arr();
@@ -638,6 +688,10 @@ public class Rules {
           m != null ? m.group(conf.path("group").asText()) : no.substring(start, start + length);
       var f = fs.get(e.getKey());
       if (f == null) continue;
+      if (raw == null) {
+        attrs.putNull(e.getKey());
+        continue;
+      }
       JsonNode v = TextNode.valueOf(raw);
       if (conf.has("map")) v = conf.path("map").path(raw);
       String type = f.path("type").asText();
@@ -666,14 +720,15 @@ public class Rules {
         unparsed.add(no.substring(start, i));
       }
     }
+    ObjectNode normalizedParsed = attrs;
     try {
-      normalize(c, b, attrs, true, true);
+      normalizedParsed = normalize(c, b, attrs, true, true);
     } catch (Problem er) {
       errors.addAll((ArrayNode) er.errors);
     }
     return Json.object(
         "attributes",
-        attrs,
+        normalizedParsed,
         "parseRuleVersionId",
         schema.path("id"),
         "matchType",

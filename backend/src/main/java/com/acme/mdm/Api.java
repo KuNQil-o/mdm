@@ -55,6 +55,15 @@ public class Api {
       HttpServletRequest r, @RequestBody(required = false) JsonNode incoming) {
     String p = r.getRequestURI().substring("/api/v1".length()), method = r.getMethod();
     JsonNode body = incoming == null ? Json.obj() : incoming;
+    if ((p.startsWith("/materials")
+            && !Set.of("/materials:validate", "/materials:decisions").contains(p))
+        || p.startsWith("/requests")
+        || p.startsWith("/import-")
+        || p.startsWith("/integration-")
+        || p.startsWith("/deliveries")
+        || p.startsWith("/export-jobs"))
+      throw new Problem(
+          410, "LEGACY_V2_RETIRED", "V3以ERP为事实源，请使用Source Dataset、Assignment Ledger与ERP回写接口");
     validateMethod(p, method);
     boolean read =
         method.equals("GET")

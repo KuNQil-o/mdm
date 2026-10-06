@@ -1,17 +1,15 @@
-# 默认决策
-- 基线：原始 PRD V2.0 原文保存在 docs，粘贴实施要求为用户开发授权；可创建工程文件。
-- Java21 + Spring Boot3.4.3、Vue3、PostgreSQL16.6，模块化单体，JDBC事务和Flyway；无Redis/Kafka依赖。
-- 同级角色可兼任但申请不可自审；按类别审批角色，状态由平台权威维护。
-- 料号大小写敏感，最长128，默认流水不重置；UUID稳定，正式号不回收。
-- 用户与成员分开；开发登录只能选择数据库登记用户，用服务端session标识；仅dev profile开启。
-- 默认AST运算集按PRD，十进制BigDecimal，数值{value,unit}；引用{type,id}；发布包固定语义。
-- 真实ERP未提供，独立本地模拟服务验证开发流程，不能算真实ERP UAT。
-- 运行依赖使用Docker或外部PostgreSQL，不创建额外Git worktree。
-- 暂不使用缓存，缓存故障演练不适用；上线身份来源与生产容量/保留期待确认。
-- JSON Schema 使用 NetworkNT 1.5.6，对原输入及规范化结果执行结构校验；可见/必填/派生的唯一业务结论来自后端，网页异步获取结论。
-- 前端保留JSON十进制原始token再序列化，不用二进制浮点执行领域计算。当前验证浏览器支持JSON.parse source context；企业旧浏览器需另行验证或补兼容解析器。
-- 查询使用固定截止时间与排序值/UUID游标；并发更新记录可能退出当前结果集，不承诺跨页数据库历史快照。后台导出冻结条件和截止时间，默认200行同步阈值。
-- 导入UPDATE按选择的类别及对象绑定Schema版本分任务，不自动升级版本。改变类别重新上传，避免复用另一类别的文件/映射上下文。
-- FILE出站每个JSONL文件承载一个事件，保持目标事件顺序并等待人工回执；入站支持多行逐行处理。
-- 默认投递重试60/300/1800/7200秒；测试实例独立配置1秒。目标最低发送间隔持久化；每日对账02:00UTC，以已登记且当前有效的成员执行。
-- 指标来自当前进程最多2000条实际样本，重启后重新采样；不提供跨进程历史指标仓库。无Redis，因此不声称执行了缓存故障演练。
+# V3 实施决策
+
+- PRD V3.0 为唯一需求基线。原文与测试用例保留，V2 文档放入 archive-v2 作历史资料。
+- 模块化单体：Java21 / Spring Boot3.4.3 / Vue3 / PostgreSQL16.6。没有 Redis/Kafka 必需依赖。
+- ERP SoR。MDM 的 SourceSnapshot 明确为 NON_AUTHORITATIVE_COPY，Ledger 是号码发放证据，二者不替代 ERP 物料事实。
+- Dataset Root 稳定主键/唯一键；默认一行一物料。Join 只允许 1:1/N:1 等值关联，重复不取第一条；缺失必须配置 ERROR/NULL/DEFAULT。
+- 身份 canonical 保留完整类型化值及字段顺序；SHA256 用作定位，数据库以完整 canonical 比较分配碰撞槽。默认同类别一 Identity 只对应一来源记录。
+- 实际执行顺序按 PRD7.4：读取→Mapping→标准化/派生/校验→Identity→Code→Ledger；Preview 不消耗序列。
+- 发布固定对象与配置依赖；独立 Golden 和 ERP 契约通过后双人审批。历史账本永远解释当时版本，新默认配置只服务新物料。
+- 默认 existingNoPolicy IGNORE；可配置 VERIFY / IMPORT_AS_LEGACY / ERROR。禁止覆盖 ERP 其他非空号，禁止自动改既有正式号。
+- 关联参考表变更选择 RESCAN_UNISSUED，避免仅依赖 Root 时间漏掉未发号候选。ERP API 推送只接受绑定来源身份。
+- 编号、流水、Ledger、Task、Outbox、操作日志原子提交；外部 HTTP 在编号事务提交后执行。条件写入+稳定幂等键+当前值查询处理不确定结果。
+- ERP 业务 Reference 来源 Dataset 显式声明并随发布固定。纯 MDM 配置字典需显式 METADATA_CATALOG 标记；不从 MDM 目录冒充 ERP 业务事实。
+- 部署控制网络目标与环境凭据绑定，业务设计员不能扩大网络/秘密读取权限。开发 ERP 仅测试，不是企业 UAT。
+- 生产指标、真实 ERP 接入、正式业务公式与容量验收列为后续验证；不做 IFS/KRS 迁移或生产切换。

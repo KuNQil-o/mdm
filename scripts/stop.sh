@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 mdm_root=$(cd "$(dirname "$0")/.." && pwd)
-for mdm_name in frontend backend erp; do
+for mdm_name in frontend backend erp-v3 erp; do
  mdm_pidfile="$mdm_root/.runtime/$mdm_name.pid"
  if [ -f "$mdm_pidfile" ]; then
   mdm_pid=$(cat "$mdm_pidfile")
