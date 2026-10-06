@@ -2,6 +2,8 @@
 
 当前唯一需求基线是 [PRD V3.0](docs/通用料号与物料主数据平台_PRD_V3.0.md)，验收依据 [测试用例 V1.0](docs/MDM料号平台_测试用例_V1.0.md)。差距分析与实施顺序见 [实施计划](docs/implementation-plan.md)，逐用例证据见 [覆盖矩阵](docs/requirements-matrix.md) 和 [验收报告](docs/acceptance-report.md)。
 
+日常操作和配置流程见 [使用说明 V3.0](docs/使用说明_V3.0.md)，包括多表 Dataset、规则发布、发号、台账查询、ERP 回写与异常处理。
+
 ERP 是物料事实源。MDM 保存来源结构、标准化配置、完整 Identity、料号规则、不可变发号台账、任务与必要的非权威快照。核心管线为：
 
 ```text
