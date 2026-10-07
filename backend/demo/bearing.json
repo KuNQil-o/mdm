@@ -1,0 +1,15 @@
+{
+ "categoryCode":"BEARING","name":"轴承",
+ "schema":{"attributes":[
+  {"attributeCode":"bearingType","name":"轴承类型","type":"ENUM","required":true,"case":"UPPER","options":[{"code":"DEEP_GROOVE"},{"code":"ANGULAR"}]},
+  {"attributeCode":"innerDiameter","name":"内径","type":"DECIMAL","required":true,"min":1,"scale":3,"unit":"MM"},
+  {"attributeCode":"outerDiameter","name":"外径","type":"DECIMAL","required":true,"min":1,"scale":3,"unit":"MM"},
+  {"attributeCode":"width","name":"宽度","type":"DECIMAL","required":true,"min":1,"scale":3,"unit":"MM"},
+  {"attributeCode":"sealType","name":"密封方式","type":"STRING","required":true,"case":"UPPER","length":10},
+  {"attributeCode":"manufacturer","name":"制造商","type":"STRING","required":true,"case":"UPPER","length":30},
+  {"attributeCode":"note","name":"备注","type":"STRING"}],"units":{"MM":{"dimension":"LENGTH","factor":1},"CM":{"dimension":"LENGTH","factor":10}}},
+ "identity":{"attributes":["bearingType","innerDiameter","outerDiameter","width","sealType","manufacturer"]},
+ "validation":{"rules":[{"field":"outerDiameter","assert":{"op":"gt","args":[{"field":"outerDiameter"},{"field":"innerDiameter"}]},"message":"外径必须大于内径","severity":"ERROR"}]},
+ "codeRule":{"separator":"-","segments":[{"type":"CONSTANT","value":"BR"},{"type":"ATTRIBUTE","field":"bearingType"},{"type":"NUMBER_FORMAT","field":"innerDiameter"},{"type":"NUMBER_FORMAT","field":"outerDiameter"},{"type":"NUMBER_FORMAT","field":"width"},{"type":"ATTRIBUTE","field":"sealType"},{"type":"REFERENCE_CODE","field":"manufacturer"}]},
+ "samples":[{"callerSystemCode":"ERP_DEMO","attributes":{"bearingType":"DEEP_GROOVE","innerDiameter":25,"outerDiameter":52,"width":15,"sealType":"2RS","manufacturer":"SKF"},"expectedMaterialNo":"BR-DEEP_GROOVE-25-52-15-2RS-SKF"}]
+}

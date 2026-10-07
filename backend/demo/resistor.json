@@ -1,0 +1,15 @@
+{
+ "categoryCode":"RESISTOR","name":"电子元器件 · 电阻",
+ "schema":{"attributes":[
+  {"attributeCode":"resistance","name":"阻值","type":"STRING","required":true,"case":"UPPER","length":20},
+  {"attributeCode":"tolerance","name":"公差","type":"STRING","required":true,"length":10},
+  {"attributeCode":"power","name":"功率","type":"STRING","required":true,"case":"UPPER","length":20},
+  {"attributeCode":"package","name":"封装","type":"STRING","required":true,"length":10},
+  {"attributeCode":"manufacturer","name":"制造商","type":"STRING","required":true,"case":"UPPER","length":30},
+  {"attributeCode":"rohs","name":"RoHS","type":"BOOLEAN","default":true},
+  {"attributeCode":"qualifiedDate","name":"认证日期","type":"DATE"},
+  {"attributeCode":"note","name":"备注","type":"STRING"}]},
+ "identity":{"attributes":["resistance","tolerance","power","package","manufacturer"]},
+ "codeRule":{"separator":"-","allowedPattern":"[A-Z0-9_.%-]+","segments":[{"type":"CONSTANT","value":"EC"},{"type":"ATTRIBUTE","field":"package"},{"type":"SEQUENCE","name":"MAIN","width":6,"reset":"NEVER"}]},
+ "samples":[{"callerSystemCode":"PLM_DEMO","attributes":{"resistance":"10K","tolerance":"1%","power":"0.25W","package":"0603","manufacturer":"YAGEO"},"expectedMaterialNo":"EC-0603-{SEQUENCE:MAIN:6}"}]
+}

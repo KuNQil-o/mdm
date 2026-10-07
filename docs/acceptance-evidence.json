@@ -1,597 +1,225 @@
 {
-  "generatedAt": "2026-10-06T10:33:01.994667+00:00",
-  "httpRunId": "A62AE03A",
-  "documentCases": 165,
-  "p0": {
-    "passed": 160,
-    "total": 160
-  },
-  "p1": {
-    "passed": 4,
-    "total": 5,
-    "unrun": [
-      "PERF-009"
+  "project": "Material Identity & Number Governance V4.0",
+  "branch": "v4.0",
+  "timezone": "Asia/Shanghai",
+  "generatedAt": "2026-10-07T13:56:27.429356+08:00",
+  "scope": "Independent new project; PRD V4.0 P0; development verification only",
+  "backend": {
+    "measuredAt": "2026-10-07T13:55:15.871401+08:00",
+    "passed": true,
+    "tests": 33,
+    "failed": 0,
+    "cases": [
+      {
+        "name": "test_caller_owns_record_save_and_retry",
+        "seconds": 0.864
+      },
+      {
+        "name": "test_light_profile_mapping_and_protected_derivation",
+        "seconds": 0.174
+      },
+      {
+        "name": "test_dag_cycle_invalid_dependency_and_script_rejected",
+        "seconds": 0.1
+      },
+      {
+        "name": "test_validation_boolean_ast_warning_and_error_detail",
+        "seconds": 0.135
+      },
+      {
+        "name": "test_types_defaults_enum_reference_dictionary_and_exact_precision",
+        "seconds": 0.116
+      },
+      {
+        "name": "test_period_scopes_segment_padding_format_and_preview",
+        "seconds": 0.002
+      },
+      {
+        "name": "test_long_identity_full_comparison_and_delimiter_safety",
+        "seconds": 0.127
+      },
+      {
+        "name": "test_code_conflict_rolls_back_source_and_idempotency",
+        "seconds": 0.137
+      },
+      {
+        "name": "test_database_immutable_facts_and_sequence_rewind",
+        "seconds": 0.125
+      },
+      {
+        "name": "test_failed_release_samples_cannot_publish_and_review_freeze",
+        "seconds": 0.161
+      },
+      {
+        "name": "test_duplicate_identity_and_code_samples_detected",
+        "seconds": 0.12
+      },
+      {
+        "name": "test_rate_limit_persists_and_invalid_methods",
+        "seconds": 0.149
+      },
+      {
+        "name": "test_security_audit_redaction_scope_and_monitoring",
+        "seconds": 0.202
+      },
+      {
+        "name": "test_tenant_pause_preview_allowed_formal_blocked",
+        "seconds": 0.128
+      },
+      {
+        "name": "test_draft_preview_permissions_and_no_published_release",
+        "seconds": 0.123
+      },
+      {
+        "name": "test_signed_requests_tamper_and_nonce_replay",
+        "seconds": 0.12
+      },
+      {
+        "name": "test_cross_site_write_denied_and_contract",
+        "seconds": 0.048
+      },
+      {
+        "name": "test_tenants_allow_identical_category_identity_and_material_no",
+        "seconds": 0.17
+      },
+      {
+        "name": "test_versioned_dictionary_normalization_code_snapshot",
+        "seconds": 0.164
+      },
+      {
+        "name": "test_ac01_normalization_and_non_identity_change",
+        "seconds": 0.122
+      },
+      {
+        "name": "test_ac02_response_lost_idempotent_retry",
+        "seconds": 0.122
+      },
+      {
+        "name": "test_ac03_idempotency_conflict_and_caller_scope",
+        "seconds": 0.13
+      },
+      {
+        "name": "test_ac04_source_binding_new_keys",
+        "seconds": 0.964
+      },
+      {
+        "name": "test_ac05_cross_system_identity_reuse_and_review_policy",
+        "seconds": 0.27
+      },
+      {
+        "name": "test_ac06_100_concurrent_same_identity",
+        "seconds": 0.92
+      },
+      {
+        "name": "test_ac07_100_distinct_identity_unique_numbers",
+        "seconds": 1.079
+      },
+      {
+        "name": "test_ac08_100_previews_no_sequence_or_assignment",
+        "seconds": 0.61
+      },
+      {
+        "name": "test_ac09_query_explanation_history",
+        "seconds": 0.162
+      },
+      {
+        "name": "test_ac10_published_immutable_new_version_diff",
+        "seconds": 0.267
+      },
+      {
+        "name": "test_ac11_three_industries_configuration_only",
+        "seconds": 0.45
+      },
+      {
+        "name": "test_ac12_caller_contract_auth_lifecycle_and_isolation",
+        "seconds": 0.187
+      },
+      {
+        "name": "test_ac13_process_death_after_sequence_atomic_recovery",
+        "seconds": 0.277
+      },
+      {
+        "name": "test_ac14_approval_separation_draft_forbidden",
+        "seconds": 0.328
+      }
     ]
-  },
-  "http": {
-    "groups": 101,
-    "ids": 156,
-    "failures": 0
-  },
-  "junitExecutions": {
-    "BusinessTest": 10,
-    "NumberingTest": 11,
-    "DatasetEngineTest": 4,
-    "WritebackTest": 21,
-    "SourceMetadataTest": 3
   },
   "browser": {
-    "passed": 4
+    "startTime": "2026-10-07T05:55:21.731Z",
+    "passed": true,
+    "tests": 4,
+    "failed": 0,
+    "durationMs": 9190.871000000001,
+    "engine": "System Chromium"
+  },
+  "capacity": {
+    "passed": true,
+    "assignments": 1000000,
+    "categories": 503,
+    "searchMs": 28.690507000192156,
+    "reuseMs": 5.536536000363412,
+    "issueMs": 4.143146999922465,
+    "loadSeconds": 220.1563565089998,
+    "constraintsEnabled": true,
+    "indexUsed": true,
+    "measuredAt": "2026-10-07T11:16:22.842716+08:00",
+    "method": "Synthetic bulk SQL data in isolated PostgreSQL with constraints and service query/issue/reuse; not 1M HTTP calls"
   },
   "performance": {
-    "previewP95Ms": 26.33,
-    "issueP95Ms": 34.43,
-    "samples": 30,
-    "scope": "local cloud + simulated ERP; not production load"
+    "requests": 200,
+    "schedulePerSecond": 20,
+    "elapsedSeconds": 9.960191203999784,
+    "successes": 200,
+    "assignmentP50Ms": 10.06766699902073,
+    "assignmentP95Ms": 15.603571000610827,
+    "assignmentP99Ms": 19.618968000941095,
+    "previewP95Ms": 9.750646000611596,
+    "uniqueNumbers": 200,
+    "passed": true,
+    "measuredAt": "2026-10-07T13:56:05.077436+08:00",
+    "method": "Local single-instance 200 requests at 20/s scheduling; short baseline, not production sustained SLA"
   },
-  "restoreTables": {
-    "mdm": 46,
-    "mdm_erp_v3": 15
+  "restore": {
+    "passed": true,
+    "measuredAt": "2026-10-07T13:55:31.901138+08:00",
+    "method": "Exported consistent snapshot; restore to fresh database; compare full-row fingerprints",
+    "tableCounts": {
+      "material_assignment": 203,
+      "sequence_counter": 1,
+      "source_binding": 204,
+      "assignment_idempotency": 204,
+      "config_version": 19,
+      "release_package": 7,
+      "caller_system": 9,
+      "operation_log": 382,
+      "tenant": 2,
+      "membership": 10,
+      "role": 12
+    },
+    "rowFingerprintsEqual": true,
+    "invariants": {
+      "orphanBindings": 0,
+      "duplicateNumbers": 0,
+      "duplicateIdentities": 0
+    }
   },
-  "realErpUat": false,
-  "productionReleased": false,
-  "coverage": {
-    "CORE-001": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "GC-001": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "GC-002": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "GC-003": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "GC-004": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "DS-002": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "DS-006": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "DS-007": [
-      "HTTP：七个玻璃布业务属性从七个关联展开并按Golden发号"
-    ],
-    "CORE-002": [
-      "HTTP：铜箔共用引擎，基重与二维尺寸按配置编码"
-    ],
-    "CF-001": [
-      "HTTP：铜箔共用引擎，基重与二维尺寸按配置编码"
-    ],
-    "CF-002": [
-      "HTTP：铜箔共用引擎，基重与二维尺寸按配置编码"
-    ],
-    "CF-005": [
-      "HTTP：铜箔共用引擎，基重与二维尺寸按配置编码"
-    ],
-    "CHEM-001": [
-      "HTTP：CHEM 独立Golden编码"
-    ],
-    "PP-001": [
-      "HTTP：PP 独立Golden编码"
-    ],
-    "PP-002": [
-      "HTTP：PP 独立Golden编码",
-      "HTTP：半固化片玻璃属性由固定Dataset读取ERP玻璃布并展开"
-    ],
-    "PP-003": [
-      "HTTP：PP 独立Golden编码"
-    ],
-    "PP-004": [
-      "HTTP：PP 独立Golden编码"
-    ],
-    "PP-005": [
-      "HTTP：PP 独立Golden编码"
-    ],
-    "FILM-001": [
-      "HTTP：FILM 独立Golden编码"
-    ],
-    "FILM-005": [
-      "HTTP：FILM 独立Golden编码"
-    ],
-    "FILM-007": [
-      "HTTP：FILM 独立Golden编码"
-    ],
-    "BOARD-001": [
-      "HTTP：BOARD 独立Golden编码"
-    ],
-    "BOARD-002": [
-      "HTTP：BOARD 独立Golden编码"
-    ],
-    "BOARD-004": [
-      "HTTP：BOARD 独立Golden编码"
-    ],
-    "BOARD-005": [
-      "HTTP：BOARD 独立Golden编码"
-    ],
-    "RESIN-001": [
-      "HTTP：RESIN 独立Golden编码"
-    ],
-    "MAT-001": [
-      "HTTP：MAT 独立Golden编码"
-    ],
-    "MAT-004": [
-      "HTTP：MAT 独立Golden编码"
-    ],
-    "CONS-001": [
-      "HTTP：CONS 独立Golden编码"
-    ],
-    "CONS-004": [
-      "HTTP：CONS 独立Golden编码"
-    ],
-    "GC-005": [
-      "HTTP：GC 属性变化区分Identity和编码"
-    ],
-    "GC-006": [
-      "HTTP：GC 属性变化区分Identity和编码"
-    ],
-    "GC-007": [
-      "HTTP：GC 属性变化区分Identity和编码"
-    ],
-    "CHEM-002": [
-      "HTTP：CHEM 属性变化区分Identity和编码"
-    ],
-    "CHEM-003": [
-      "HTTP：CHEM 属性变化区分Identity和编码"
-    ],
-    "CHEM-004": [
-      "HTTP：CHEM 属性变化区分Identity和编码"
-    ],
-    "CF-003": [
-      "HTTP：CF 属性变化区分Identity和编码"
-    ],
-    "CF-004": [
-      "HTTP：CF 属性变化区分Identity和编码"
-    ],
-    "PP-006": [
-      "HTTP：PP 属性变化区分Identity和编码"
-    ],
-    "FILM-006": [
-      "HTTP：FILM 属性变化区分Identity和编码"
-    ],
-    "BOARD-003": [
-      "HTTP：BOARD 属性变化区分Identity和编码"
-    ],
-    "MAT-002": [
-      "HTTP：MAT 属性变化区分Identity和编码"
-    ],
-    "CONS-003": [
-      "HTTP：CONS 属性变化区分Identity和编码"
-    ],
-    "CORE-007": [
-      "HTTP：不同ERP键的相同完整Identity不重复发号"
-    ],
-    "CORE-008": [
-      "HTTP：不同ERP键的相同完整Identity不重复发号"
-    ],
-    "GC-010": [
-      "HTTP：不同ERP键的相同完整Identity不重复发号"
-    ],
-    "FILM-008": [
-      "HTTP：不同ERP键的相同完整Identity不重复发号"
-    ],
-    "CONS-005": [
-      "HTTP：不同ERP键的相同完整Identity不重复发号"
-    ],
-    "CORE-009": [
-      "HTTP：来源重复与相同请求幂等返回原号"
-    ],
-    "CORE-024": [
-      "HTTP：来源重复与相同请求幂等返回原号"
-    ],
-    "INT-004": [
-      "HTTP：来源重复与相同请求幂等返回原号"
-    ],
-    "CORE-004": [
-      "HTTP：非编码字段缺失或备注变更保持原号"
-    ],
-    "CORE-017": [
-      "HTTP：非编码字段缺失或备注变更保持原号"
-    ],
-    "CORE-019": [
-      "HTTP：非编码字段缺失或备注变更保持原号"
-    ],
-    "CORE-018": [
-      "HTTP：已发号后身份变化进入异常，不重编码"
-    ],
-    "CORE-006": [
-      "HTTP：127 cm 与1270 mm标准化后同Identity"
-    ],
-    "CORE-003": [
-      "HTTP：必填null错误含字段路径"
-    ],
-    "ERR-001": [
-      "HTTP：必填null错误含字段路径"
-    ],
-    "GC-008": [
-      "HTTP：缺失来源厂商定位Join路径"
-    ],
-    "DS-003": [
-      "HTTP：缺失来源厂商定位Join路径"
-    ],
-    "CORE-016": [
-      "HTTP：停用参考值阻止新号，历史解释保留"
-    ],
-    "GC-009": [
-      "HTTP：停用参考值阻止新号，历史解释保留"
-    ],
-    "FILM-002": [
-      "HTTP：FILM 尺寸/裁切严格XOR"
-    ],
-    "FILM-003": [
-      "HTTP：FILM 尺寸/裁切严格XOR"
-    ],
-    "FILM-004": [
-      "HTTP：FILM 尺寸/裁切严格XOR"
-    ],
-    "BOARD-006": [
-      "HTTP：BOARD 尺寸/裁切严格XOR"
-    ],
-    "BOARD-007": [
-      "HTTP：BOARD 尺寸/裁切严格XOR"
-    ],
-    "BOARD-008": [
-      "HTTP：BOARD 尺寸/裁切严格XOR"
-    ],
-    "CHEM-005": [
-      "HTTP：分类和型号组合不合法"
-    ],
-    "CF-007": [
-      "HTTP：非法等级拒绝"
-    ],
-    "CONS-002": [
-      "HTTP：非法中小类别组合拒绝"
-    ],
-    "MAT-005": [
-      "HTTP：单位量纲错误拒绝"
-    ],
-    "ERR-005": [
-      "HTTP：单位量纲错误拒绝"
-    ],
-    "ERR-004": [
-      "HTTP：超出数值精度拒绝，绝不四舍五入"
-    ],
-    "ERR-002": [
-      "HTTP：超长文本拒绝，绝不截断"
-    ],
-    "CHEM-007": [
-      "HTTP：描述由属性派生且不属于Identity"
-    ],
-    "CF-006": [
-      "HTTP：二维尺寸描述变化不影响Identity"
-    ],
-    "MAT-003": [
-      "HTTP：非编码状态变更不重编号"
-    ],
-    "CORE-023": [
-      "HTTP：原子台账与完整版本/分段/trace解释"
-    ],
-    "CORE-025": [
-      "HTTP：原子台账与完整版本/分段/trace解释"
-    ],
-    "CORE-022": [
-      "HTTP：预览返回明确分段而不正式占号"
-    ],
-    "INT-001": [
-      "HTTP：ERP来源客户端申请正式料号"
-    ],
-    "ERR-008": [
-      "HTTP：源API未登记字段拒绝"
-    ],
-    "INT-002": [
-      "HTTP：真实ERP回写当前值确认，重复不会新发号"
-    ],
-    "INT-005": [
-      "HTTP：真实ERP回写当前值确认，重复不会新发号"
-    ],
-    "INT-009": [
-      "HTTP：下游库存/BOM/工艺在ERP保存，变更不影响台账"
-    ],
-    "INT-010": [
-      "HTTP：下游库存/BOM/工艺在ERP保存，变更不影响台账"
-    ],
-    "INT-011": [
-      "HTTP：下游库存/BOM/工艺在ERP保存，变更不影响台账"
-    ],
-    "INT-012": [
-      "HTTP：下游库存/BOM/工艺在ERP保存，变更不影响台账"
-    ],
-    "INT-013": [
-      "HTTP：下游库存/BOM/工艺在ERP保存，变更不影响台账"
-    ],
-    "PARSE-001": [
-      "HTTP：GC 明确版本反解析与生成输入一致"
-    ],
-    "PARSE-009": [
-      "HTTP：GC 明确版本反解析与生成输入一致",
-      "HTTP：CF 明确版本反解析与生成输入一致",
-      "HTTP：PP 明确版本反解析与生成输入一致",
-      "HTTP：FILM 明确版本反解析与生成输入一致",
-      "HTTP：BOARD 明确版本反解析与生成输入一致"
-    ],
-    "PARSE-002": [
-      "HTTP：CF 明确版本反解析与生成输入一致"
-    ],
-    "PARSE-003": [
-      "HTTP：PP 明确版本反解析与生成输入一致"
-    ],
-    "PARSE-004": [
-      "HTTP：FILM 明确版本反解析与生成输入一致"
-    ],
-    "PARSE-005": [
-      "HTTP：BOARD 明确版本反解析与生成输入一致"
-    ],
-    "PARSE-006": [
-      "HTTP：未知料号格式明确失败"
-    ],
-    "CORE-014": [
-      "HTTP：无有效Code Rule无法发布或正式发号"
-    ],
-    "RESIN-002": [
-      "HTTP：无有效Code Rule无法发布或正式发号"
-    ],
-    "CORE-015": [
-      "HTTP：缺必填属性映射拒绝发布"
-    ],
-    "ERR-011": [
-      "HTTP：空Identity拒绝发布"
-    ],
-    "CFG-003": [
-      "HTTP：没有样本不能启用Identity/组合版本"
-    ],
-    "CFG-005": [
-      "HTTP：独立Golden不符合预期时阻止发布"
-    ],
-    "CFG-002": [
-      "HTTP：已发布Mapping不可原地篡改"
-    ],
-    "CFG-001": [
-      "HTTP：可编辑草稿不会影响默认生产版本"
-    ],
-    "SEC-004": [
-      "HTTP：无发布岗位不能审批配置"
-    ],
-    "SRC-001": [
-      "HTTP：DDL仅形成元数据，FK建议需确认，不创建ERP表"
-    ],
-    "SRC-002": [
-      "HTTP：DDL仅形成元数据，FK建议需确认，不创建ERP表"
-    ],
-    "SRC-003": [
-      "HTTP：DDL仅形成元数据，FK建议需确认，不创建ERP表"
-    ],
-    "SRC-005": [
-      "HTTP：结构新版本显示依赖影响且不篡改历史"
-    ],
-    "CFG-006": [
-      "HTTP：结构新版本显示依赖影响且不篡改历史"
-    ],
-    "ERR-010": [
-      "HTTP：Root来源键为空禁止保存"
-    ],
-    "DS-008": [
-      "HTTP：关联字符与数字字段明确拒绝"
-    ],
-    "DS-005": [
-      "HTTP：明确声明1:N粒度扩张拒绝"
-    ],
-    "SRC-004": [
-      "HTTP：无主表FK仍可显式关联"
-    ],
-    "DS-001": [
-      "HTTP：无Join单表API Dataset成功形成逻辑输入"
-    ],
-    "CFG-004": [
-      "HTTP：字符集非法的Golden阻止发布"
-    ],
-    "ERR-003": [
-      "HTTP：字符集非法的Golden阻止发布"
-    ],
-    "CHEM-006": [
-      "HTTP：字典项停用发布后不能用于新号"
-    ],
-    "PP-007": [
-      "HTTP：失效ERP引用阻止新发号，恢复修改ERP事实源"
-    ],
-    "SEC-002": [
-      "HTTP：跨租户对象和台账不可读"
-    ],
-    "SEC-003": [
-      "HTTP：跨租户对象和台账不可读",
-      "HTTP：来源客户端不能越过自己来源边界"
-    ],
-    "CORE-010": [
-      "HTTP：100并发不同Identity正式发号唯一"
-    ],
-    "PERF-004": [
-      "HTTP：100并发不同Identity正式发号唯一"
-    ],
-    "BOARD-009": [
-      "HTTP：100并发基板XOR尺寸模式按流水唯一"
-    ],
-    "CORE-011": [
-      "HTTP：100并发不同来源键同Identity最多一个台账"
-    ],
-    "PERF-005": [
-      "HTTP：100并发不同来源键同Identity最多一个台账"
-    ],
-    "PERF-003": [
-      "HTTP：100并发预览返回稳定结果"
-    ],
-    "PERF-001": [
-      "HTTP：实测稳态预览/发号P95"
-    ],
-    "PERF-002": [
-      "HTTP：实测稳态预览/发号P95"
-    ],
-    "SEC-005": [
-      "HTTP：保留类别读权限时，无集成权限仍拒绝发号"
-    ],
-    "CFG-008": [
-      "HTTP：同时有设计和发布岗位也不能自我审批"
-    ],
-    "CORE-005": [
-      "HTTP：编码明确使用厂商业务码而不是数据库ID"
-    ],
-    "DS-004": [
-      "HTTP：真实重复业务键Join检测粒度冲突，绝不取第一行"
-    ],
-    "GC-011": [
-      "HTTP：真实重复业务键Join检测粒度冲突，绝不取第一行"
-    ],
-    "CORE-020": [
-      "HTTP：新版规则服务新记录，旧发号及解析永久绑定旧版"
-    ],
-    "GC-012": [
-      "HTTP：新版规则服务新记录，旧发号及解析永久绑定旧版"
-    ],
-    "PARSE-008": [
-      "HTTP：新版规则服务新记录，旧发号及解析永久绑定旧版"
-    ],
-    "CFG-007": [
-      "HTTP：默认组合版本回退，已发号新旧版本均不改写"
-    ],
-    "PARSE-007": [
-      "HTTP：两个明确指定解析版本均匹配时拒绝猜测"
-    ],
-    "ERR-009": [
-      "HTTP：跨租户Reference所有权明确拒绝"
-    ],
-    "ERR-007": [
-      "HTTP：派生循环在配置阶段阻止"
-    ],
-    "ERR-012": [
-      "HTTP：超过128字符的料号不能通过发布样本"
-    ],
-    "CORE-013": [
-      "HTTP：不同Identity同码返回冲突，不加后缀"
-    ],
-    "CF-008": [
-      "HTTP：不同Identity同码返回冲突，不加后缀"
-    ],
-    "CORE-012": [
-      "HTTP：单字符流水容量耗尽拒绝，不回收已发编号"
-    ],
-    "ERR-013": [
-      "HTTP：单字符流水容量耗尽拒绝，不回收已发编号"
-    ],
-    "ERR-006": [
-      "HTTP：业务除零失败，不产生正式号"
-    ],
-    "PERF-007": [
-      "HTTP：重复消费同一回写任务不重复发送ERP写入"
-    ],
-    "SEC-006": [
-      "HTTP：有权限的审计记录可定位发号操作者和trace"
-    ],
-    "CORE-021": [
-      "HTTP：新增必填字段的Schema升级：旧记录固定v1，新记录严格v2"
-    ],
-    "SRC-006": [
-      "HTTP：独立ERP View与Join等价，删除已映射字段生成依赖告警并阻止读取"
-    ],
-    "SRC-007": [
-      "HTTP：独立ERP View与Join等价，删除已映射字段生成依赖告警并阻止读取"
-    ],
-    "DS-009": [
-      "HTTP：独立ERP View与Join等价，删除已映射字段生成依赖告警并阻止读取"
-    ],
-    "DS-010": [
-      "HTTP：API Dataset和成胶按明确Parse版本共用同一引擎"
-    ],
-    "RESIN-003": [
-      "HTTP：API Dataset和成胶按明确Parse版本共用同一引擎"
-    ],
-    "INT-003": [
-      "JUnit：WritebackTest.businessFailureIsNotSuccess"
-    ],
-    "INT-006": [
-      "JUnit：WritebackTest.currentERPConflictNeverOverwritten"
-    ],
-    "INT-007": [
-      "JUnit：WritebackTest.retryPreservesAssignmentAndNumber"
-    ],
-    "INT-008": [
-      "JUnit：WritebackTest.unknownWithoutIdempotencyCannotBlindRetry"
-    ],
-    "ERR-014": [
-      "JUnit：NumberingTest.databaseFailureRollsBackSequenceLedgerTaskAndOutbox"
-    ],
-    "PERF-008": [
-      "JUnit：NumberingTest.transientDatabaseConnectionLossRecoversWithoutDirtyAssignments"
-    ],
-    "SEC-001": [
-      "JUnit：NumberingTest.identicalNumberIsLegalInDifferentTenants"
-    ],
-    "PERF-006": [
-      "重启：PENDING扫描/回写恢复，游标与原台账保留"
-    ],
-    "E2E-01": [
-      "Chromium：frontend/e2e/v3.spec.ts，4/4通过"
-    ],
-    "E2E-02": [
-      "Chromium：frontend/e2e/v3.spec.ts，4/4通过"
-    ],
-    "E2E-03": [
-      "Chromium：frontend/e2e/v3.spec.ts，4/4通过"
-    ],
-    "E2E-04": [
-      "Chromium：frontend/e2e/v3.spec.ts，4/4通过"
-    ],
-    "AC-01": [
-      "开发环境：SRC-001 SRC-002 SRC-003 SRC-007"
-    ],
-    "AC-02": [
-      "开发环境：DS-002 DS-004 DS-006 DS-007 GC-011"
-    ],
-    "AC-03": [
-      "开发环境：CORE-003 CORE-005 CORE-006 CORE-015"
-    ],
-    "AC-04": [
-      "开发环境：CORE-007 CORE-017 CORE-018"
-    ],
-    "AC-05": [
-      "开发环境：CORE-010 CORE-020 CORE-023 PARSE-008"
-    ],
-    "AC-06": [
-      "开发环境：自动轮询：仅ERP新建，Worker发号并确认回写"
-    ],
-    "AC-07": [
-      "开发环境：SEC-001 SEC-002 SEC-003 CFG-002 CFG-008"
-    ],
-    "AC-08": [
-      "开发环境：CORE-018 CORE-019 GC-012 SRC-006"
-    ],
-    "AC-09": [
-      "开发环境：INT-007 INT-008 PERF-006"
-    ],
-    "AC-10": [
-      "开发环境：CORE-010 CORE-011 ERR-014 PERF-008"
-    ],
-    "AC-11": [
-      "开发环境：INT-001 CORE-022 CORE-023"
-    ],
-    "AC-12": [
-      "开发环境：审计/指标、重启、两库61表恢复摘要一致"
-    ],
-    "AC-13": [
-      "开发环境：CORE-018"
-    ],
-    "AC-14": [
-      "开发环境：INT-006"
-    ]
-  }
+  "restart": {
+    "passed": true,
+    "measuredAt": "2026-10-07T13:52:15.797403+08:00",
+    "sameAssignmentAndNumber": true,
+    "reused": true
+  },
+  "security": {
+    "npmKnownVulnerabilities": 0,
+    "pythonKnownVulnerabilities": 0,
+    "measuredAt": "2026-10-07T13:52:34.145327+08:00",
+    "enterpriseSignoff": false
+  },
+  "externalAcceptancePending": [
+    "Real business system UAT",
+    "Enterprise Identity and Code Rules acceptance",
+    "Enterprise security baseline and Chrome/Edge versions",
+    "Production TLS, secret management, long-running throughput, 99.9% availability and RPO/RTO"
+  ],
+  "productionDeployed": false
 }

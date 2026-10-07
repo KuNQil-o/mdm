@@ -1,15 +1,16 @@
+name: mdm-v4
 services:
   db:
     image: postgres:16.6@sha256:557fea37a744d5f4c8faab304b0a90858b53ab119735a88c131fd19dab802f36
     environment:
-      POSTGRES_DB: mdm
+      POSTGRES_DB: mdm_v4
       POSTGRES_USER: mdm
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-mdm_dev_only}
-    ports: ["127.0.0.1:5432:5432"]
-    volumes: ["mdm-data:/var/lib/postgresql/data"]
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mdm_v4_dev_only}
+    ports: ["127.0.0.1:5433:5432"]
+    volumes: ["v4-data:/var/lib/postgresql/data"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm"]
+      test: ["CMD-SHELL", "pg_isready -U mdm -d mdm_v4"]
       interval: 2s
       retries: 20
 volumes:
-  mdm-data:
+  v4-data:

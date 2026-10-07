@@ -1,0 +1,5 @@
+fastapi==0.142.2
+uvicorn==0.54.0
+psycopg[binary,pool]==3.2.9
+simplejson==3.20.1
+starlette==1.7.0

@@ -1,164 +1,42 @@
-import { reactive } from "vue";
-export const session = reactive({
-  tenant: "",
-  user: null as any,
-  context: null as any,
-  generation: 0,
-  busy: 0,
-  error: "",
-  notice: "",
-});
-const uncertain = new Map<string, string>();
-export async function api(
-  path: string,
-  method = "GET",
-  body?: any,
-  version?: any,
-  background = false,
-): Promise<any> {
-  const generation = session.generation;
-  const abort = new AbortController();
-  const timer = setTimeout(() => abort.abort(), 15000);
-  const raw = body === undefined ? undefined : stringify(body);
-  const signature = method + path + raw + version;
-  const headers: Record<string, string> = {
-    "X-Tenant-Code": session.tenant,
-    "X-Request-ID": crypto.randomUUID(),
-  };
-  if (raw !== undefined) headers["Content-Type"] = "application/json";
-  if (method !== "GET")
-    headers["Idempotency-Key"] =
-      uncertain.get(signature) || crypto.randomUUID();
-  if (version !== undefined) headers["If-Match"] = '"' + version + '"';
-  if (!background) {
-    session.busy++;
-    session.error = "";
+import { reactive } from 'vue';
+export const session=reactive({tenant:'',user:null as any,permissions:[] as string[],error:'',notice:'',busy:0,generation:0});
+const pending=new Map<string,string>();
+export async function api(path:string,method='GET',body?:any,version?:number,callerKey?:string):Promise<any>{
+ const generation=session.generation;
+ const headers:Record<string,string>={'X-Tenant-Code':session.tenant,'X-Request-ID':crypto.randomUUID()};
+ if(body!==undefined) headers['Content-Type']='application/json';
+ if(version!==undefined) headers['If-Match']='"'+version+'"';
+ if(callerKey){
+  headers['X-Caller-Key']=callerKey;
+  headers['X-Timestamp']=String(Math.floor(Date.now()/1000));headers['X-Nonce']=crypto.randomUUID();
+  const bytes=new TextEncoder().encode(body===undefined?'':JSON.stringify(body));
+  const hex=(buffer:ArrayBuffer)=>Array.from(new Uint8Array(buffer),x=>x.toString(16).padStart(2,'0')).join('');
+  const hash=hex(await crypto.subtle.digest('SHA-256',bytes));
+  const message=[headers['X-Timestamp'],headers['X-Nonce'],method,'/api/v1/'+path,hash].join('\n');
+  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(callerKey),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  headers['X-Signature']=hex(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(message)));
+ }
+ const signature=session.tenant+'|'+method+'|'+path+'|'+JSON.stringify(body);
+ if(method!=='GET') headers['Idempotency-Key']=pending.get(signature)||crypto.randomUUID();
+ const abort=new AbortController(); const timer=setTimeout(()=>abort.abort(),30000);
+ session.busy++; session.error='';
+ try{
+  const r=await fetch('/api/v1/'+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),signal:abort.signal,cache:'no-store'});
+  const data=await r.json();
+  if(generation!==session.generation) throw new Error('CONTEXT_CHANGED');
+  if(!r.ok){
+   if(r.status<500)pending.delete(signature);
+   else pending.set(signature,headers['Idempotency-Key']);
+   throw new Error(data.code+'：'+data.message+(data.details?.length?'\n'+data.details.map((e:any)=>e.fieldPath+' '+e.message).join('\n'):'')+'\n请求ID：'+data.requestId);
   }
-  try {
-    const res = await fetch(
-      path.startsWith("/api/") ? path : "/api/v1" + path,
-      { method, headers, body: raw, signal: abort.signal, cache: "no-store" },
-    );
-    const data = parse(await res.text());
-    if (generation !== session.generation) throw new Error("CONTEXT_CHANGED");
-    if (!res.ok) {
-      uncertain.delete(signature);
-      throw new Error(
-        data.code +
-          "：" +
-          data.message +
-          (data.errors?.length
-            ? "\n" +
-              data.errors
-                .map((e: any) => e.fieldPath + " " + e.message)
-                .join("\n")
-            : ""),
-      );
-    }
-    uncertain.delete(signature);
-    return data;
-  } catch (e: any) {
-    if (e.message === "CONTEXT_CHANGED" || background) throw e;
-    if (e instanceof TypeError || e.name === "AbortError") {
-      uncertain.set(signature, headers["Idempotency-Key"]);
-      session.error = "请求结果待确认。请使用相同操作重试，系统会复用幂等键。";
-    } else session.error = e.message;
-    throw e;
-  } finally {
-    clearTimeout(timer);
-    if (!background) session.busy--;
-  }
+  pending.delete(signature); return data;
+ }catch(e:any){
+  if(e.message==='CONTEXT_CHANGED') throw e;
+  if(e instanceof TypeError||e.name==='AbortError'){
+   pending.set(signature,headers['Idempotency-Key']);session.error='请求结果待确认。请保持相同输入重试，系统将使用原幂等键。';
+  }else session.error=e.message;
+  throw e;
+ }finally{clearTimeout(timer);session.busy--;}
 }
-export class ExactDecimal {
-  constructor(public __decimal: string) {}
-  toString() {
-    return this.__decimal;
-  }
-}
-export function decimal(value: string) {
-  if (!/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value))
-    throw new Error("请输入十进制数值");
-  return new ExactDecimal(value);
-}
-export function parse(raw: string) {
-  return (JSON.parse as any)(raw, (key: string, value: any, context: any) =>
-    key === "value" && typeof value === "number" && context?.source
-      ? decimal(context.source)
-      : value,
-  );
-}
-export function clone(value: any) {
-  return parse(stringify(value));
-}
-export function stringify(value: any, indent?: number) {
-  return JSON.stringify(
-    value,
-    (_k, v) =>
-      v && typeof v === "object" && "__decimal" in v
-        ? "__MDM_DECIMAL__" + v.__decimal + "__END__"
-        : v,
-    indent,
-  ).replace(
-    /"__MDM_DECIMAL__(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)__END__"/g,
-    "$1",
-  );
-}
-export async function download(id: string, name = "下载文件") {
-  session.busy++;
-  try {
-    const r = await fetch("/api/v1/files/" + id, {
-      headers: { "X-Tenant-Code": session.tenant },
-      cache: "no-store",
-    });
-    if (!r.ok) {
-      const e = await r.json();
-      throw new Error(e.message);
-    }
-    const u = URL.createObjectURL(await r.blob());
-    const a = document.createElement("a");
-    a.href = u;
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(u), 1000);
-  } catch (e: any) {
-    session.error = e.message;
-  } finally {
-    session.busy--;
-  }
-}
-export function pretty(x: any) {
-  return x === undefined ? "未设置" : stringify(x, 2);
-}
-export const labels: Record<string, string> = {
-  DRAFT: "草稿",
-  ACTIVE: "已生效",
-  INACTIVE: "已停用",
-  IN_REVIEW: "待审批",
-  REVIEW: "待审批",
-  PUBLISHED: "已发布",
-  RETIRED: "已停用",
-  APPROVED: "已批准",
-  SUCCEEDED: "业务成功",
-  PENDING: "待处理",
-  FAILED: "失败",
-  RETRY_WAIT: "等待重试",
-  WAIT_CONFIRMATION: "待确认",
-  RESULT_UNKNOWN: "结果未知",
-  SUSPENDED: "已暂停",
-  ARCHIVED: "已归档",
-  UPLOADED: "已上传",
-  VALIDATING: "预检中",
-  READY: "预检完成",
-  COMMITTING: "提交中",
-  COMPLETED: "已完成",
-  PARTIAL_FAILED: "部分失败",
-  PAUSED: "已暂停",
-  CANCELLED: "已取消",
-  VALID: "预检通过",
-  ERROR: "预检错误",
-  NEW: "首次生效",
-  CHANGE: "正式变更",
-  DEACTIVATE: "停用",
-  REACTIVATE: "重新启用",
-  REVIEW_REQUIRED: "需要审核",
-};
+export const pretty=(value:any)=>JSON.stringify(value,null,2);
+export const labels:Record<string,string>={DRAFT:'草稿',ACTIVE:'已启用',SUSPENDED:'已暂停',REVIEW:'待审批',PUBLISHED:'已发布',RETIRED:'已退役',ARCHIVED:'已归档',ISSUED:'已发号',REUSED:'已复用'};

@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-mdm_root=$(cd "$(dirname "$0")/.." && pwd)
-for mdm_name in frontend backend erp-v3 erp; do
- mdm_pidfile="$mdm_root/.runtime/$mdm_name.pid"
+cd "$(dirname "$0")/.."
+for mdm_name in backend frontend; do
+ mdm_pidfile=".runtime/v4-$mdm_name.pid"
  if [ -f "$mdm_pidfile" ]; then
   mdm_pid=$(cat "$mdm_pidfile")
-  if [ -r "/proc/$mdm_pid/cmdline" ] && tr '\0' ' ' < "/proc/$mdm_pid/cmdline" | rg -q "$mdm_root"; then kill "$mdm_pid"; fi
-  rm -f "$mdm_pidfile"
+  if kill -0 "$mdm_pid" 2>/dev/null && [ -r "/proc/$mdm_pid/cmdline" ] && tr '\0' ' ' < "/proc/$mdm_pid/cmdline" | rg -q 'uvicorn|vite'; then kill "$mdm_pid"; fi
+  rm "$mdm_pidfile"
  fi
 done
-# PostgreSQL and its volume are deliberately retained.

@@ -1,0 +1,17 @@
+{
+ "categoryCode":"GLASS_CLOTH","name":"玻璃布",
+ "schema":{"attributes":[
+  {"attributeCode":"clothType","name":"布种","type":"STRING","required":true,"length":20,"trim":true,"case":"UPPER"},
+  {"attributeCode":"manufacturer","name":"制造商","type":"ENUM","required":true,"case":"UPPER","options":[{"code":"HH","name":"宏和","aliases":["HONGHE"]},{"code":"NT","name":"南通"}]},
+  {"attributeCode":"treatment","name":"处理方式","type":"ENUM","required":true,"case":"UPPER","options":[{"code":"A"},{"code":"B"}]},
+  {"attributeCode":"basisWeight","name":"基重","type":"DECIMAL","required":true,"min":1,"max":1000,"scale":3,"unit":"G_M2"},
+  {"attributeCode":"width","name":"幅宽","type":"DECIMAL","required":true,"min":100,"max":3000,"scale":3,"unit":"MM"},
+  {"attributeCode":"sizeClass","name":"幅宽分级","type":"STRING","required":true},
+  {"attributeCode":"note","name":"备注","type":"STRING","length":500}
+ ],"units":{"MM":{"dimension":"LENGTH","factor":1},"CM":{"dimension":"LENGTH","factor":10},"M":{"dimension":"LENGTH","factor":1000},"G_M2":{"dimension":"BASIS_WEIGHT","factor":1}}},
+ "identity":{"attributes":["manufacturer","clothType","treatment",{"field":"basisWeight","scale":3},{"field":"width","scale":3}]},
+ "derivation":{"attributes":[{"field":"sizeClass","expression":{"op":"if","args":[{"op":"gte","args":[{"field":"width"},1000]},"WIDE","NORMAL"]}}]},
+ "validation":{"rules":[{"field":"width","assert":{"op":"gte","args":[{"field":"width"},100]},"message":"幅宽不得小于100毫米","severity":"ERROR"},{"field":"basisWeight","assert":{"op":"lte","args":[{"field":"basisWeight"},500]},"message":"基重超过常用范围，请确认","severity":"WARNING"}]},
+ "codeRule":{"separator":"-","maxLength":128,"allowedPattern":"[A-Z0-9-]+","segments":[{"type":"CONSTANT","value":"GC"},{"type":"ATTRIBUTE","field":"clothType"},{"type":"ATTRIBUTE","field":"treatment"},{"type":"NUMBER_FORMAT","field":"basisWeight","scale":0},{"type":"UNIT_FORMAT","field":"width","unit":"MM","scale":0},{"type":"DICTIONARY","field":"manufacturer","map":{"HH":"HH","NT":"NT"}}]},
+ "samples":[{"callerSystemCode":"ERP_DEMO","attributes":{"clothType":"7628","manufacturer":"HH","treatment":"A","basisWeight":210,"width":1270},"expectedMaterialNo":"GC-7628-A-210-1270-HH"}]
+}
